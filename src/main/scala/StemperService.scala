@@ -35,10 +35,9 @@ class StemperService extends Actor with SprayActorLogging {
   }
 
   //val source = scala.io.Source.fromURL(new URL("http://ustream.tv/")).mkString
+
   val myURL = getClass.getClassLoader.getResource("file.html")
   val source = scala.io.Source.fromURL(myURL).mkString
-  //val source = scala.io.Source.fromFile("file.html").mkString
-
   val template = new Mustache(source)
 
   def index() = HttpResponse(
