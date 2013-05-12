@@ -17,9 +17,17 @@ class StemperService extends Actor with SprayActorLogging {
   implicit val timeout: Timeout = 2.second // for the actor 'asks'
   import context.dispatcher // ExecutionContext for the futures and scheduler
 
+  def fastPath: Http.FastPath = {
+    case HttpRequest(GET, Uri.Path("/fast-ping"), _, _, _) => HttpResponse(entity = "FAST-PONG!")
+    case HttpRequest(GET, Uri.Path("/fast-html"), _, _, _) => index()
+  }
+
   def receive = {
     // when a new connection comes in we register ourselves as the connection handler
-    case _: Http.Connected => sender ! Http.Register(self)
+    case _: Http.Connected => sender ! Http.Register(self, fastPath = fastPath)
+
+    case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
+      sender ! HttpResponse(entity = "PONG!")
 
     case _: HttpRequest =>
       sender ! index()

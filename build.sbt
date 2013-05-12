@@ -11,7 +11,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "io.spray"            %   "spray-can"     % "1.1-20130424",
+  "io.spray"            %   "spray-can"     % "1.1-20130511",
   "com.typesafe.akka"   %%  "akka-actor"    % "2.1.2"
 )
 
