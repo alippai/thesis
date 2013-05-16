@@ -24,14 +24,30 @@ class StemperService extends Actor with SprayActorLogging {
       HttpResponse(entity = "FAST-PONG!")
   }
 
+  val file_1k = scala.io.Source.fromURL(getClass.getClassLoader.getResource("templates/1k.html"))("UTF-8").mkString
+  val file_2k = scala.io.Source.fromURL(getClass.getClassLoader.getResource("templates/2k.html"))("UTF-8").mkString
+  val file_5k = scala.io.Source.fromURL(getClass.getClassLoader.getResource("templates/5k.html"))("UTF-8").mkString
+  val file_10k = scala.io.Source.fromURL(getClass.getClassLoader.getResource("templates/10k.html"))("UTF-8").mkString
+  val t_1k = new Mustache(file_1k)
+  val t_2k = new Mustache(file_2k)
+  val t_5k = new Mustache(file_5k)
+  val t_10k = new Mustache(file_10k)
+
   def receive = {
     // when a new connection comes in we register ourselves as the connection handler
-    //case _: Http.Connected => sender ! Http.Register(self, fastPath = fastPath)
-
     case _: Http.Connected => sender ! Http.Register(self, fastPath = fastPath)
 
     case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
       sender ! HttpResponse(entity = "PONG!")
+
+    case HttpRequest(GET, Uri.Path("/1k"), _, _, _) =>
+      sender ! HttpResponse(entity = HttpEntity(ContentType(`text/html`, `UTF-8`), t_1k.render(Map("name"->"world", "test" -> System.currentTimeMillis.toString()))))
+    case HttpRequest(GET, Uri.Path("/2k"), _, _, _) =>
+      sender ! HttpResponse(entity = HttpEntity(ContentType(`text/html`, `UTF-8`), t_2k.render(Map("name"->"world", "test" -> System.currentTimeMillis.toString()))))
+    case HttpRequest(GET, Uri.Path("/5k"), _, _, _) =>
+      sender ! HttpResponse(entity = HttpEntity(ContentType(`text/html`, `UTF-8`), t_5k.render(Map("name"->"world", "test" -> System.currentTimeMillis.toString()))))
+    case HttpRequest(GET, Uri.Path("/10k"), _, _, _) =>
+      sender ! HttpResponse(entity = HttpEntity(ContentType(`text/html`, `UTF-8`), t_10k.render(Map("name"->"world", "test" -> System.currentTimeMillis.toString()))))
 
     case _: HttpRequest =>
       sender ! index()
@@ -46,14 +62,7 @@ class StemperService extends Actor with SprayActorLogging {
       )
   }
 
-  //val source = scala.io.Source.fromURL(new URL("http://ustream.tv/")).mkString
-
-  val myURL = getClass.getClassLoader.getResource("file.html")
-  val source = scala.io.Source.fromURL(myURL)("UTF-8").mkString
-  val template = new Mustache(source)
-
   def index() = HttpResponse(
-    entity = HttpEntity(ContentType(`text/html`, `UTF-8`), template.render(Map("name"->"world", "test" -> System.currentTimeMillis.toString())))
-    //entity = HttpEntity(`text/html`, template.render(Map("name"->"world")))
+    entity = HttpEntity(ContentType(`text/html`, `UTF-8`), file_1k)
   )
 }
